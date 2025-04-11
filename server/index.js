@@ -6,7 +6,6 @@ const connectDB = require('./config/db');
 const taskRoutes = require('./routes/taskRoutes');
 const { generalLimiter } = require("./middleware/rateLimiter");
 
-
 const app = express();
 app.use(express.json());
 connectDB();

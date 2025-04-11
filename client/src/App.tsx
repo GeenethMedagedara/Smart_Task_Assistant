@@ -9,6 +9,11 @@ import Tasks from "./pages/Tasks";
 import Assistant from "./pages/Assistant";
 import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
+import axios from 'axios';
+
+
+axios.defaults.baseURL = "http://localhost:5000/api";
+axios.defaults.withCredentials = true;
 
 const queryClient = new QueryClient();
 
