@@ -1,4 +1,5 @@
 const Tasks = require("../models/Tasks")
+const sendToZapier = require('../utils/zapier.js');
 
 const createtask = async (req,res) => {
     try {
@@ -21,6 +22,9 @@ const createtask = async (req,res) => {
             completed: newTask2.status === 'completed',
         });
         await task.save();
+
+        // Send to Zapier
+        await sendToZapier(task);
 
         // console.log(tt)
         // if (!title || !description) {

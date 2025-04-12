@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { SendHorizontal, Bot, PlusCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import axios from 'axios';
 
 interface Message {
   id: string;
@@ -25,7 +25,7 @@ const AIAssistant = () => {
     },
   ]);
   
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (input.trim() === '') return;
     
     // Add user message
@@ -39,27 +39,25 @@ const AIAssistant = () => {
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     
-    // Simulate AI response
-    setTimeout(() => {
-      const aiResponses = [
-        "Based on your schedule, I recommend breaking this task into smaller subtasks for better management.",
-        "I've analyzed your workload and suggest prioritizing this for tomorrow morning when your productivity is highest.",
-        "Would you like me to create a structured plan for this task with deadlines for each phase?",
-        "This task seems similar to ones you've completed before. Would you like me to apply similar timeframes?",
-        "I notice this is a recurring task. Should I help you automate parts of it or create a template?",
-      ];
-      
-      const randomResponse = aiResponses[Math.floor(Math.random() * aiResponses.length)];
-      
+    try {
+      // Send API request using axios
+      const response = await axios.post('/ai/assistant-chat', {
+        message: input,
+      });
+
+      // Add AI response
+      console.log(response.data.reply);
       const aiMessage: Message = {
         id: Date.now().toString(),
-        content: randomResponse,
+        content: response.data.reply, // Assuming the API returns the response in a field named 'response'
         isUser: false,
         timestamp: new Date(),
       };
-      
+
       setMessages(prev => [...prev, aiMessage]);
-    }, 1000);
+    } catch (error) {
+      console.error('Error fetching AI response:', error);
+    }
   };
   
   const handleKeyDown = (e: React.KeyboardEvent) => {
