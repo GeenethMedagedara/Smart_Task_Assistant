@@ -59,6 +59,44 @@ const AIAssistant = () => {
       console.error('Error fetching AI response:', error);
     }
   };
+
+  const handleGenerateSubtasks = async () => {
+    try {
+      const response = await axios.post('/ai/subtasks', {
+        message: input,
+      });
+
+      const aiMessage: Message = {
+        id: Date.now().toString(),
+        content: response.data.subtasks, // Assuming the API returns subtasks in a field named 'subtasks'
+        isUser: false,
+        timestamp: new Date(),
+      };
+
+      setMessages(prev => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('Error generating subtasks:', error);
+    }
+  };
+
+  const handleOptimizeSchedule = async () => {
+    try {
+      const response = await axios.post('/ai/categorize', {
+        message: input,
+      });
+
+      const aiMessage: Message = {
+        id: Date.now().toString(),
+        content: response.data.category, // Assuming the API returns the optimized schedule in a field named 'optimizedSchedule'
+        isUser: false,
+        timestamp: new Date(),
+      };
+
+      setMessages(prev => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('Error optimizing schedule:', error);
+    }
+  };
   
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -125,11 +163,21 @@ const AIAssistant = () => {
             </Button>
           </div>
           <div className="flex gap-2 mt-3">
-            <Button size="sm" variant="outline" className="text-xs">
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-xs"
+              onClick={handleGenerateSubtasks}
+            >
               <PlusCircle className="h-3 w-3 mr-1" />
               Generate subtasks
             </Button>
-            <Button size="sm" variant="outline" className="text-xs">
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-xs"
+              onClick={handleOptimizeSchedule}
+            >
               <PlusCircle className="h-3 w-3 mr-1" />
               Optimize my schedule
             </Button>

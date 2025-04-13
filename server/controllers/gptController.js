@@ -19,12 +19,14 @@ const chat = async (req, res) => {
 };
 const subtasks = async (req, res) => {
     try {
-        const { task } = req.body;
+        const { message } = req.body;
+        const task = message
         const response = await fetch('http://localhost:5001/subtasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ task })
         });
+        console.log("this is the message: "+message)
         const data = await response.json();
         res.json(data);
     } catch (error) {
@@ -35,7 +37,8 @@ const subtasks = async (req, res) => {
 
 const categorize = async (req, res) => {
     try {
-        const { task } = req.body;
+        const { message } = req.body;
+        const task = message
         const response = await fetch('http://localhost:5001/categorize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
