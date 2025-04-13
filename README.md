@@ -81,3 +81,16 @@ http://localhost:8080
 ## Why This is Built
 
 > This project is created to gain an understanding of how to implement automation and scheduling techniques and to showcase practical integration of LLMs, microservices, usage of automation tools in a real-world task management scenarios.
+
+## Screenshots
+
+AI Assistant
+
+![Screenshot 2025-04-13 232858](https://github.com/user-attachments/assets/0886ed16-b5f5-406b-9e1a-90e5428416f6)
+
+Zapier automation workflow
+
+![Screenshot 2025-04-13 170026](https://github.com/user-attachments/assets/55361bc7-652c-4a47-8821-bbdf04f7f70d)
+
+
+
