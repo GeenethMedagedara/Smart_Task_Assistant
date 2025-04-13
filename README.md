@@ -15,6 +15,7 @@ Developed an AI-integrated Smart Task Assistant to streamline daily productivity
 - [Installation](#installation)
 - [How This Works](#how-this-works)
 - [Why Built](#why-this-is-built)
+- [Screenshots](#screenshots)
 
 ## Features:
 
