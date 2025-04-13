@@ -1,5 +1,7 @@
 # Smart_Task_Assistant
 
+![Screenshot 2025-04-13 232541](https://github.com/user-attachments/assets/c57568ff-8d6c-4d54-aae7-e122337b4f73)
+
 ---
 
 ## Overview
