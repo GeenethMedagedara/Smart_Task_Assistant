@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { SendHorizontal, Bot, PlusCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import axios from 'axios';
+import { chatApi } from '@/api/chatApi';
 
 interface Message {
   id: string;
@@ -40,10 +41,8 @@ const AIAssistant = () => {
     setInput('');
     
     try {
-      // Send API request using axios
-      const response = await axios.post('/ai/assistant-chat', {
-        message: input,
-      });
+
+      const response = await chatApi.normalChat(input);
 
       // Add AI response
       console.log(response.data.reply);
@@ -62,9 +61,8 @@ const AIAssistant = () => {
 
   const handleGenerateSubtasks = async () => {
     try {
-      const response = await axios.post('/ai/subtasks', {
-        message: input,
-      });
+
+      const response = await chatApi.subtaskingChat(input);
 
       const aiMessage: Message = {
         id: Date.now().toString(),
@@ -81,9 +79,8 @@ const AIAssistant = () => {
 
   const handleOptimizeSchedule = async () => {
     try {
-      const response = await axios.post('/ai/categorize', {
-        message: input,
-      });
+
+      const response = await chatApi.categorizingChat(input);
 
       const aiMessage: Message = {
         id: Date.now().toString(),

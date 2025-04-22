@@ -7,86 +7,11 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import axios from 'axios';
-
-const mockTasks: Task[] = [
-  {
-    id: '1',
-    title: 'Complete dashboard design',
-    description: 'Finish the UI design for the dashboard and export assets for development',
-    dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
-    priority: 'high',
-    status: 'pending',
-    category: 'Design',
-  },
-  {
-    id: '2',
-    title: 'Weekly team meeting',
-    description: 'Discuss project progress and assign new tasks',
-    dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 1 day from now
-    priority: 'medium',
-    status: 'pending',
-    category: 'Meetings',
-  },
-  {
-    id: '3',
-    title: 'Review client feedback',
-    description: 'Go through client feedback and make necessary adjustments',
-    dueDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
-    priority: 'high',
-    status: 'overdue',
-    category: 'Client',
-  },
-  {
-    id: '4',
-    title: 'Update documentation',
-    description: 'Update the project documentation with recent changes',
-    dueDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
-    priority: 'low',
-    status: 'completed',
-    category: 'Documentation',
-  },
-  {
-    id: '5',
-    title: 'Prepare for client presentation',
-    description: 'Create slides and gather materials for the upcoming client meeting',
-    dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days from now
-    priority: 'high',
-    status: 'pending',
-    category: 'Client',
-  },
-  {
-    id: '6',
-    title: 'Research new technologies',
-    description: 'Explore new frameworks and tools that could improve our development process',
-    dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-    priority: 'low',
-    status: 'pending',
-    category: 'Research',
-  },
-  {
-    id: '7',
-    title: 'Fix navigation bug',
-    description: 'Address the issue with the navigation menu on mobile devices',
-    dueDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
-    priority: 'medium',
-    status: 'overdue',
-    category: 'Development',
-  },
-  {
-    id: '8',
-    title: 'Update team on project status',
-    description: 'Send out a status report to all team members',
-    dueDate: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000), // 4 days ago
-    priority: 'medium',
-    status: 'completed',
-    category: 'Communication',
-  },
-];
+import { taskApi } from '@/api/taskApi';
 
 const TasksPage = () => {
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
-  // const [tasks, setTasks] = useState<Task[]>(mockTasks);
-  const [tasks, setTasks] = useState<Task[]>(mockTasks);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   useEffect(() => {
@@ -95,7 +20,7 @@ const TasksPage = () => {
 
   const getalltasks = async () => {
     try {
-      const res = await axios.get('/tasks/getall');
+      const res = await taskApi.getAllTasks();
       console.log('Tasks fetched:', res.data);
 
       const updatedTasks = res.data.map((task: any) => {
@@ -124,16 +49,6 @@ const TasksPage = () => {
 
   const handleCreateTask = async (data: any) => {
 
-    const newTask: Task = {
-      id: Date.now().toString(),
-      title: data.title,
-      description: data.description || '',
-      dueDate: data.dueDate,
-      priority: data.priority,
-      status: 'pending' as TaskStatus,
-      category: data.category || undefined,
-    };
-
     const newTask2: Task = {
       id: Date.now().toString(),
       title: data.title,
@@ -145,15 +60,16 @@ const TasksPage = () => {
     };
 
     try {
-      const res = await axios.post('/tasks/add', {newTask2})
+      const res = await taskApi.createTask(newTask2);
       console.log('Task created:', res);
+      if(res.status === 201) {
+        window.location.reload();
+      }
     } catch (error) {
       console.error('Error creating task:', error);
       toast.error('Failed to create task');
     }
     
-
-    setTasks([...tasks, newTask]);
     setIsTaskFormOpen(false);
     toast.success('Task created successfully!');
   };
@@ -176,7 +92,7 @@ const TasksPage = () => {
     };
 
     try {
-      await axios.post('/tasks/update', { id: editingTask._id, ...updatedTask });
+      await taskApi.updateTask(editingTask._id, updatedTask )
 
       const updatedTasks = tasks.map((task) => {
         if (task._id === editingTask._id) {
@@ -197,7 +113,7 @@ const TasksPage = () => {
   
   const handleDeleteTask = async (_id: string) => {
     try {
-      await axios.post('/tasks/delete', { id: _id });
+      await taskApi.deleteTask(_id);
 
       setTasks(tasks.filter((task) => task._id !== _id));
       toast.success('Task deleted successfully!');
@@ -209,7 +125,7 @@ const TasksPage = () => {
   
   const handleCompleteTask = async (_id: string, completed: boolean) => {
     try {
-      await axios.post('/tasks/completion', { id: _id, completed });
+      await taskApi.updateTaskStatus(_id, completed);
 
       const updatedTasks = tasks.map((task) => {
         if (task._id === _id) {

@@ -10,45 +10,8 @@ import { toast } from 'sonner';
 import { CheckSquare, Clock, AlertTriangle, ListTodo } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import axios from 'axios';
+import { taskApi } from '@/api/taskApi';
 
-const mockTasks: Task[] = [
-  {
-    id: '1',
-    title: 'Complete dashboard design',
-    description: 'Finish the UI design for the dashboard and export assets for development',
-    dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
-    priority: 'high',
-    status: 'pending',
-    category: 'Design',
-  },
-  {
-    id: '2',
-    title: 'Weekly team meeting',
-    description: 'Discuss project progress and assign new tasks',
-    dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 1 day from now
-    priority: 'medium',
-    status: 'pending',
-    category: 'Meetings',
-  },
-  {
-    id: '3',
-    title: 'Review client feedback',
-    description: 'Go through client feedback and make necessary adjustments',
-    dueDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
-    priority: 'high',
-    status: 'overdue',
-    category: 'Client',
-  },
-  {
-    id: '4',
-    title: 'Update documentation',
-    description: 'Update the project documentation with recent changes',
-    dueDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
-    priority: 'low',
-    status: 'completed',
-    category: 'Documentation',
-  },
-];
 
 const productivityTips = [
   {
@@ -71,16 +34,16 @@ const productivityTips = [
 
 const Dashboard = () => {
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
-  const [tasks, setTasks] = useState<Task[]>(mockTasks);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   useEffect(() => {
-      getalltasks();
+      getall();
     }, []);
 
-    const getalltasks = async () => {
+    const getall = async () => {
       try {
-        const res = await axios.get('/tasks/getall');
+        const res = await taskApi.getAllTasks();
         console.log('Tasks fetched:', res.data);
   
         const updatedTasks = res.data.map((task: any) => {
@@ -114,15 +77,6 @@ const Dashboard = () => {
   const overdueTasks = tasks.filter(task => task.status === 'overdue');
   
   const handleCreateTask = async (data: any) => {
-    const newTask: Task = {
-      id: Date.now().toString(),
-      title: data.title,
-      description: data.description || '',
-      dueDate: data.dueDate,
-      priority: data.priority,
-      status: 'pending' as TaskStatus,
-      category: data.category || undefined,
-    };
 
     const newTask2: Task = {
       id: Date.now().toString(),
@@ -135,14 +89,16 @@ const Dashboard = () => {
     };
 
     try {
-      const res = await axios.post('/tasks/add', {newTask2})
+      const res = await taskApi.createTask(newTask2);
       console.log('Task created:', res);
+      if(res.status === 201) {
+        window.location.reload();
+      }
     } catch (error) {
       console.error('Error creating task:', error);
       toast.error('Failed to create task');
     }
     
-    setTasks([...tasks, newTask]);
     setIsTaskFormOpen(false);
     toast.success('Task created successfully!');
   };
@@ -151,29 +107,6 @@ const Dashboard = () => {
     setEditingTask(task);
     setIsTaskFormOpen(true);
   };
-  
-  // const handleUpdateTask = (data: any) => {
-  //   if (!editingTask) return;
-    
-  //   const updatedTasks = tasks.map((task) => {
-  //     if (task.id === editingTask.id) {
-  //       return {
-  //         ...task,
-  //         title: data.title,
-  //         description: data.description || '',
-  //         dueDate: data.dueDate,
-  //         priority: data.priority,
-  //         category: data.category || undefined,
-  //       };
-  //     }
-  //     return task;
-  //   });
-    
-  //   setTasks(updatedTasks);
-  //   setIsTaskFormOpen(false);
-  //   setEditingTask(null);
-  //   toast.success('Task updated successfully!');
-  // };
 
   const handleUpdateTask = async (data: any) => {
     if (!editingTask) return;
@@ -188,7 +121,7 @@ const Dashboard = () => {
     };
 
     try {
-      await axios.post('/tasks/update', { id: editingTask._id, ...updatedTask });
+      await taskApi.updateTask(editingTask._id, updatedTask )
 
       const updatedTasks = tasks.map((task) => {
         if (task._id === editingTask._id) {
@@ -206,15 +139,11 @@ const Dashboard = () => {
       toast.error('Failed to update task');
     }
   };
-  
-  // const handleDeleteTask = (id: string) => {
-  //   setTasks(tasks.filter((task) => task.id !== id));
-  //   toast.success('Task deleted successfully!');
-  // };
 
   const handleDeleteTask = async (_id: string) => {
     try {
-      await axios.post('/tasks/delete', { id: _id });
+      // await axios.post('/tasks/delete', { id: _id });
+      await taskApi.deleteTask(_id);
 
       setTasks(tasks.filter((task) => task._id !== _id));
       toast.success('Task deleted successfully!');
@@ -223,25 +152,10 @@ const Dashboard = () => {
       toast.error('Failed to delete task');
     }
   };
-  
-  // const handleCompleteTask = (id: string, completed: boolean) => {
-  //   const updatedTasks = tasks.map((task) => {
-  //     if (task.id === id) {
-  //       return {
-  //         ...task,
-  //         status: completed ? ('completed' as TaskStatus) : ('pending' as TaskStatus),
-  //       };
-  //     }
-  //     return task;
-  //   });
-    
-  //   setTasks(updatedTasks);
-  //   toast.success(`Task marked as ${completed ? 'completed' : 'pending'}`);
-  // };
 
   const handleCompleteTask = async (_id: string, completed: boolean) => {
     try {
-      await axios.post('/tasks/completion', { id: _id, completed });
+      await taskApi.updateTaskStatus(_id, completed);
 
       const updatedTasks = tasks.map((task) => {
         if (task._id === _id) {
@@ -271,7 +185,7 @@ const Dashboard = () => {
   
   return (
     <AppLayout>
-      <WelcomeSection userName="John" />
+      <WelcomeSection userName="Geeneth" />
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <SummaryCard
