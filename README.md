@@ -1,4 +1,4 @@
-# Smart_Task_Assistant
+# Smart Task Assistant
 
 ![Screenshot 2025-04-13 233417](https://github.com/user-attachments/assets/3126d900-8dc4-48a4-b907-a935de5b7a63)
 
